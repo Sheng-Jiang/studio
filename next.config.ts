@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Enable standalone output for Docker containers
+  output: 'standalone',
 };
 
 export default nextConfig;
