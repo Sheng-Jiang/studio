@@ -1,23 +1,30 @@
 import { NextResponse } from 'next/server';
-import { checkDatabaseConnection } from '@/lib/db';
+import { checkDatabaseConnection, getConnectionInfo } from '@/lib/db';
 import { env } from '@/lib/env';
 
 export async function GET() {
   try {
-    const dbHealthy = await checkDatabaseConnection();
+    const dbHealthStatus = await checkDatabaseConnection();
+    const connectionInfo = getConnectionInfo();
     
     const health = {
-      status: dbHealthy ? 'healthy' : 'unhealthy',
+      status: dbHealthStatus.isHealthy ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
       version: process.env.npm_package_version || '1.0.0',
       environment: env.NODE_ENV,
       services: {
-        database: dbHealthy ? 'connected' : 'disconnected',
+        database: {
+          status: dbHealthStatus.isHealthy ? 'connected' : 'disconnected',
+          latency: dbHealthStatus.latency,
+          provider: connectionInfo.provider,
+          error: dbHealthStatus.error
+        },
       },
+      uptime: process.uptime(),
     };
 
     return NextResponse.json(health, {
-      status: dbHealthy ? 200 : 503,
+      status: dbHealthStatus.isHealthy ? 200 : 503,
     });
   } catch (error) {
     console.error('Health check failed:', error);
@@ -28,9 +35,12 @@ export async function GET() {
       version: process.env.npm_package_version || '1.0.0',
       environment: env.NODE_ENV,
       services: {
-        database: 'error',
+        database: {
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        },
       },
-      error: error instanceof Error ? error.message : 'Unknown error',
+      uptime: process.uptime(),
     }, {
       status: 503,
     });
