@@ -7,12 +7,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=production
-      - GOOGLE_GENAI_API_KEY=${GOOGLE_GENAI_API_KEY}
-    volumes:
-      # Mount for development (optional)
-      - ./.env.local:/app/.env.local:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health", "||", "exit", "1"]
@@ -28,9 +26,10 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "9002:9002"
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=development
-      - GOOGLE_GENAI_API_KEY=${GOOGLE_GENAI_API_KEY}
     volumes:
       - .:/app
       - /app/node_modules

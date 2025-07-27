@@ -40,7 +40,7 @@ export function PerformanceAnalysisDialog({
             Performance Analysis
           </DialogTitle>
           <DialogDescription>
-            Here are your weak spots from the last 50 questions. Keep practicing!
+            Here are your weak spots from the last 30 questions. Keep practicing!
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-[120px] my-4">

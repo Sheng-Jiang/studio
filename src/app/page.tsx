@@ -8,10 +8,11 @@ import { PerformanceAnalysisDialog } from "@/components/performance-analysis-dia
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, RefreshCw, ArrowRight } from "lucide-react";
+import { Check, X, RefreshCw, ArrowRight, Plus } from "lucide-react";
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ANALYSIS_THRESHOLD = 50;
+const ANALYSIS_THRESHOLD = 30;
 
 export default function Home() {
   const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
@@ -129,10 +130,18 @@ export default function Home() {
       <main className="flex flex-col items-center min-h-screen p-4 pt-8 sm:p-8 md:p-12">
         <header className="flex items-center justify-between w-full max-w-2xl mb-6">
           <h1 className="text-4xl font-bold text-primary font-headline">FlashTest</h1>
-          <Button variant="outline" size="sm" onClick={resetSession}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            New Session
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={resetSession}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              New Session
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/add-question">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Question
+              </Link>
+            </Button>
+          </div>
         </header>
 
         <div className="w-full max-w-2xl mb-6">

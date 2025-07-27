@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  topic       String
+  question    String
+  answer      String
+  difficulty  String   @default("medium")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  attempts    QuestionAttempt[]
+  
+  @@map("questions")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String?
+  email       String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sessions    QuizSession[]
+  progress    UserProgress[]
+  
+  @@map("users")
+}
+
+model QuizSession {
+  id              String   @id @default(cuid())
+  userId          String?
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  totalQuestions  Int      @default(0)
+  correctAnswers  Int      @default(0)
+  incorrectAnswers Int     @default(0)
+  user            User?    @relation(fields: [userId], references: [id])
+  attempts        QuestionAttempt[]
+  
+  @@map("quiz_sessions")
+}
+
+model QuestionAttempt {
+  id             String      @id @default(cuid())
+  sessionId      String
+  questionId     String
+  isCorrect      Boolean
+  responseTimeMs Int?
+  attemptedAt    DateTime    @default(now())
+  session        QuizSession @relation(fields: [sessionId], references: [id])
+  question       Question    @relation(fields: [questionId], references: [id])
+  
+  @@map("question_attempts")
+}
+
+model UserProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  topic          String
+  masteryLevel   Float    @default(0.0)
+  lastPracticed  DateTime @default(now())
+  totalAttempts  Int      @default(0)
+  correctAttempts Int     @default(0)
+  user           User     @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, topic])
+  @@map("user_progress")
+}

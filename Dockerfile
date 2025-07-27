@@ -9,13 +9,24 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+
+# Copy package files first
+COPY package*.json ./
+COPY next.config.* ./
+COPY tsconfig.json ./
+COPY tailwind.config.* ./
+COPY postcss.config.* ./
+COPY components.json ./
+
+# Copy source code
+COPY src ./src
+COPY public ./public
 
 # Set environment variable for production build
 ENV NODE_ENV production
